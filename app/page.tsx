@@ -22,7 +22,10 @@ interface Settings {
 
 const DEFAULT_SETTINGS: Settings = {
   marketplace: "com",
-  strategy: "auto",
+  // Default to cookie (deep) mode: the hosted site runs on Vercel datacenter
+  // IPs that Amazon blocks for anonymous scraping, so lead with the method that
+  // actually works in production. Users paste their Amazon session cookie.
+  strategy: "cookie",
   cookie: "",
   apiKey: "",
   maxPagesPerFacet: 10,
