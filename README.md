@@ -1,5 +1,8 @@
 # Amazon Review Extractor
 
+**Live:** https://amazon-review-extractor.vercel.app · **Repo:** https://github.com/tripleyak/amazon-review-extractor
+(pushes to `main` auto-deploy to production via Vercel.)
+
 Pull the **deepest recoverable set** of customer reviews for any Amazon ASIN — one at a
 time or in bulk from a CSV/Excel upload — ordered oldest → newest, deduplicated, and
 exportable to CSV/JSON. The tool is honest about coverage: it tells you how many reviews
