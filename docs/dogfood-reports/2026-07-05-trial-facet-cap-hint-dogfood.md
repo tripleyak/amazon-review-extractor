@@ -44,9 +44,11 @@ flowchart LR
 - S1: agent-browser snapshot shows the hint StaticText immediately after the
   Max pages/facet combobox; computed style check confirms `className: "muted"`,
   `color: rgb(139, 151, 173)` — identical to field-label muted color; 14px.
-- S2: desktop (1280×800) screenshot — grid intact, hint sits between the select
-  and the cookie field with normal spacing.
-- S3: mobile (375×812) screenshot — hint wraps to 3 lines;
+- S2: desktop (1280×800) screenshot
+  (`assets/2026-07-05-facet-cap-hint-desktop.png`) — grid intact, hint sits
+  between the select and the cookie field with normal spacing.
+- S3: mobile (375×812) screenshot
+  (`assets/2026-07-05-facet-cap-hint-mobile.png`) — hint wraps to 3 lines;
   `document.documentElement.scrollWidth === 375 === innerWidth` (no horizontal
   scroll).
 - S4: `agent-browser select` 10→2→10; select value verified `"2"` then `"10"`
@@ -97,7 +99,9 @@ None required — no auth, payments, email, or provider-side effects in scope.
   doesn't exactly match an option; use the dedicated `select <sel> <val>`
   command for dropdowns.
 - With another session's dev server on the default port, pin the dogfood server
-  to its own port via `.claude/launch.json` (used 3457 here).
+  to its own port (3457 here) via a launch config in the session-level
+  `~/.claude/launch.json` (the preview harness reads the session cwd's config,
+  not the repo's — a repo-level `.claude/launch.json` was ignored).
 
 ## Final Status
 
