@@ -213,8 +213,8 @@ function SingleTab({ settings }: { settings: Settings }) {
     try {
       const res = await extract(input.trim(), (e) => setLogs((l) => [...l, e]), ac.signal);
       setResult(res);
-    } catch (err: any) {
-      setResult({ ok: false, error: err?.message || String(err) } as ExtractionResult);
+    } catch (err) {
+      setResult({ ok: false, error: err instanceof Error ? err.message : String(err) } as ExtractionResult);
     } finally {
       setRunning(false);
     }
@@ -434,8 +434,8 @@ function BulkTab({ settings }: { settings: Settings }) {
         }))
       );
       if (json.asins.length === 0) setParseError("No ASINs or Amazon URLs found in that file.");
-    } catch (err: any) {
-      setParseError(err?.message || String(err));
+    } catch (err) {
+      setParseError(err instanceof Error ? err.message : String(err));
     } finally {
       setParsing(false);
     }
@@ -480,9 +480,13 @@ function BulkTab({ settings }: { settings: Settings }) {
                 : p
             )
           );
-        } catch (err: any) {
+        } catch (err) {
           setItems((prev) =>
-            prev.map((p, i) => (i === idx ? { ...p, status: "error", error: err?.message || String(err) } : p))
+            prev.map((p, i) =>
+              i === idx
+                ? { ...p, status: "error", error: err instanceof Error ? err.message : String(err) }
+                : p
+            )
           );
         }
       }

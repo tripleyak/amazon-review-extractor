@@ -37,8 +37,9 @@ export async function POST(req: NextRequest) {
         }
       }
     }
-  } catch (err: any) {
-    return NextResponse.json({ ok: false, error: `Could not parse file: ${err?.message || err}` }, { status: 400 });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return NextResponse.json({ ok: false, error: `Could not parse file: ${msg}` }, { status: 400 });
   }
 
   const asins = parseAsinList(cells);

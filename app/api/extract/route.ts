@@ -49,8 +49,8 @@ export async function POST(req: NextRequest) {
           onProgress: (e: ProgressEvent) => send("progress", e),
         });
         send("result", result);
-      } catch (err: any) {
-        send("result", { ok: false, error: err?.message || String(err) });
+      } catch (err) {
+        send("result", { ok: false, error: err instanceof Error ? err.message : String(err) });
       } finally {
         controller.close();
       }

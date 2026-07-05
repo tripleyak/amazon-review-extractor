@@ -67,7 +67,6 @@ export async function extractWithCookie(args: {
         facetsQueried++;
         const facetLabel = `${filterByStar}/${sortBy}/${reviewerType}`;
         onProgress?.({ type: "facet", message: `Facet ${facetLabel}…` });
-        let prevSize = collected.size;
         let referer: string | undefined;
 
         for (let page = 1; page <= maxPagesPerFacet; page++) {
@@ -134,7 +133,6 @@ export async function extractWithCookie(args: {
         // If an entire facet added nothing new and we already have data,
         // it's likely fully covered by another facet — keep going regardless,
         // facets are cheap relative to completeness.
-        void prevSize;
       }
     }
   }

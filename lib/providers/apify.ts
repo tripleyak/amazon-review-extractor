@@ -5,7 +5,39 @@
 
 import type { ProgressEvent, Review } from "../types";
 
-function mapApifyReview(r: any, asin: string, domain: string): Review | null {
+// Shape of one dataset item from the Apify actor. Field names vary between
+// actor versions (junglee vs others), so every alias stays optional and the
+// mapper keeps its runtime fallbacks.
+interface ApifyRawReview {
+  reviewId?: string;
+  id?: string;
+  review_id?: string;
+  reviewUrl?: string;
+  asin?: string;
+  date?: string;
+  reviewedAt?: string;
+  reviewDate?: string;
+  reviewTitle?: string;
+  title?: string;
+  reviewDescription?: string;
+  text?: string;
+  body?: string;
+  ratingScore?: number | string;
+  rating?: number | string;
+  userName?: string;
+  author?: string;
+  reviewedBy?: string;
+  country?: string;
+  isVerified?: boolean;
+  verified?: boolean;
+  verifiedPurchase?: boolean;
+  reviewReaction?: string;
+  helpfulCount?: number | string;
+  variant?: string;
+  variationAttributes?: string;
+}
+
+function mapApifyReview(r: ApifyRawReview, asin: string, domain: string): Review | null {
   const id: string =
     r.reviewId || r.id || r.review_id || r.reviewUrl?.match(/customer-reviews\/([A-Z0-9]{10,})/i)?.[1] || "";
   if (!id) return null;
@@ -71,7 +103,7 @@ export async function extractApify(args: {
     onProgress?.({ type: "error", message: `Apify HTTP ${res.status}: ${txt.slice(0, 160)}` });
     return { reviews: [], blocked: res.status === 401 || res.status === 403, pagesFetched: 1 };
   }
-  const items: any[] = await res.json();
+  const items = (await res.json()) as ApifyRawReview[];
   const collected = new Map<string, Review>();
   for (const raw of items) {
     const rev = mapApifyReview(raw, asin, domain);

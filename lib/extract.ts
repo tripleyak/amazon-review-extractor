@@ -111,13 +111,13 @@ export async function extractReviews(opts: ExtractOptions): Promise<ExtractionRe
       }
       notes.push("Anonymous mode returns only the reviews shown on the product page (~8). Use cookie or API mode for deep extraction.");
     }
-  } catch (err: any) {
-    if (err?.name === "AbortError") {
+  } catch (err) {
+    if (err instanceof Error && err.name === "AbortError") {
       notes.push("Cancelled by user.");
     } else {
       return {
         ok: false,
-        error: err?.message || String(err),
+        error: err instanceof Error ? err.message : String(err),
         coverage: {
           asin: opts.asin, marketplace: domain, totalRatings, totalReviews,
           collected: reviews.length, complete: false, notes, strategy,

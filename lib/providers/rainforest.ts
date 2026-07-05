@@ -7,7 +7,37 @@ import type { ProgressEvent, Review } from "../types";
 
 const STAR_PARAMS = ["all_stars", "five_star", "four_star", "three_star", "two_star", "one_star"];
 
-function mapRainforestReview(r: any, asin: string, domain: string, foundVia: string): Review | null {
+// Shape of one review object in Rainforest's response. Everything is optional:
+// the payload is external and versioned by Traject, so the mapper stays defensive.
+interface RainforestRawReview {
+  id?: string;
+  review_id?: string;
+  title?: string;
+  body?: string;
+  body_html?: string;
+  rating?: number | string;
+  profile?: { name?: string };
+  author?: string;
+  date?: { utc?: string; raw?: string };
+  country?: string;
+  verified_purchase?: boolean;
+  helpful_votes?: number | string;
+  attributes?: { name?: string; value?: string }[];
+  link?: string;
+}
+
+interface RainforestResponse {
+  summary?: { total_reviews?: number };
+  reviews?: RainforestRawReview[];
+  pagination?: { total_pages?: number };
+}
+
+function mapRainforestReview(
+  r: RainforestRawReview,
+  asin: string,
+  domain: string,
+  foundVia: string
+): Review | null {
   const id: string = r.id || r.review_id || "";
   if (!id) return null;
   const dateUtc: string | undefined = r.date?.utc;
@@ -23,7 +53,7 @@ function mapRainforestReview(r: any, asin: string, domain: string, foundVia: str
     country: r.country || null,
     verifiedPurchase: !!r.verified_purchase,
     helpfulVotes: Number(r.helpful_votes || 0) || 0,
-    variant: r.attributes ? r.attributes.map((a: any) => `${a.name}: ${a.value}`).join(", ") : null,
+    variant: r.attributes ? r.attributes.map((a) => `${a.name}: ${a.value}`).join(", ") : null,
     url: r.link || (id ? `https://${domain}/gp/customer-reviews/${id}` : null),
     foundVia,
   };
@@ -73,9 +103,9 @@ export async function extractRainforest(args: {
         }
         break;
       }
-      const json: any = await res.json();
+      const json = (await res.json()) as RainforestResponse;
       if (totalReviews == null && json.summary?.total_reviews) totalReviews = json.summary.total_reviews;
-      const arr: any[] = json.reviews || [];
+      const arr = json.reviews || [];
       let newOnPage = 0;
       for (const raw of arr) {
         const rev = mapRainforestReview(raw, asin, domain, `${stars}/most_recent`);
