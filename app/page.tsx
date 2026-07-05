@@ -129,6 +129,10 @@ function SettingsPanel({
                   </option>
                 ))}
               </select>
+              <span className="muted">
+                ~10 reviews per page; Amazon stops serving past ~100 per facet, so 10 pages is full
+                coverage
+              </span>
             </div>
           </div>
 
