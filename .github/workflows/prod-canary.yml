@@ -1,0 +1,33 @@
+name: prod-canary
+on:
+  schedule:
+    - cron: '23 */6 * * *'
+  workflow_dispatch:
+permissions:
+  issues: write
+  contents: read
+jobs:
+  canary:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe production
+        id: probe
+        run: |
+          code=$(curl -sL -o /tmp/body -w "%{http_code}" --max-time 30 "https://amazon-review-extractor.vercel.app/" || echo "000")
+          echo "code=$code"
+          fail=0
+          [ "$code" = "200" ] || fail=1
+          grep -q "Amazon" /tmp/body || fail=1
+          echo "fail=$fail" >> "$GITHUB_OUTPUT"
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+      - name: Open issue on failure (dedup)
+        if: steps.probe.outputs.fail == '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          existing=$(gh issue list --repo "$GITHUB_REPOSITORY" --label canary --state open --json number --jq length)
+          if [ "$existing" = "0" ]; then
+            gh issue create --repo "$GITHUB_REPOSITORY" --label canary \
+              --title "Prod canary FAIL: amazon-review-extractor (${{ steps.probe.outputs.code }})" \
+              --body "Automated 6-hourly canary failed. URL: https://amazon-review-extractor.vercel.app/ — HTTP ${{ steps.probe.outputs.code }} or content probe missing (expected: Amazon). Runs on GitHub cron; laptop-independent."
+          fi
