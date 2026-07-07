@@ -37,42 +37,74 @@ export default function Page() {
   const [showSettings, setShowSettings] = useState(true);
 
   return (
-    <div className="wrap">
-      <div className="header">
-        <h1>
-          <span className="accent">Amazon</span> Review Extractor
-        </h1>
-        <p>
-          Pull the deepest recoverable set of customer reviews for any ASIN, ordered oldest → newest.
-          Amazon caps its reviews endpoint at ~100 results <em>per filter</em>, so this tool unions across
-          every star × sort × verified facet to maximize coverage, dedupes, and reports exactly how much of
-          the listing it could reach.
-        </p>
-      </div>
+    <>
+      <a className="skip" href="#main">
+        Skip to content
+      </a>
 
-      <SettingsPanel
-        settings={settings}
-        onChange={setSettings}
-        open={showSettings}
-        toggle={() => setShowSettings((s) => !s)}
-      />
-
-      <div className="tabs">
-        <div className={`tab ${tab === "single" ? "active" : ""}`} onClick={() => setTab("single")}>
-          Single ASIN
+      <header className="hero">
+        <nav className="nav" aria-label="Primary">
+          <span className="wordmark" aria-label="Right Side Up">
+            <span>Right</span>
+            <span>Side</span>
+            <span>Up</span>
+          </span>
+          <span className="nav-tag">Review Extractor</span>
+        </nav>
+        <div className="hero-inner">
+          <p className="kicker">Right Side Up · Voice of customer</p>
+          <h1>
+            Every Amazon review, <span className="mark">oldest to newest.</span>
+          </h1>
+          <p className="lede">
+            Pull the deepest recoverable set of customer reviews for any ASIN, single or in
+            bulk. Amazon caps its reviews endpoint at ~100 results <em>per filter</em>, so this
+            tool unions across every star &times; sort &times; verified facet, dedupes, and
+            reports exactly how much of the listing it could reach.
+          </p>
         </div>
-        <div className={`tab ${tab === "bulk" ? "active" : ""}`} onClick={() => setTab("bulk")}>
-          Bulk (CSV / Excel)
+      </header>
+
+      <main className="wrap" id="main">
+        <SettingsPanel
+          settings={settings}
+          onChange={setSettings}
+          open={showSettings}
+          toggle={() => setShowSettings((s) => !s)}
+        />
+
+        <div className="tabs" role="tablist" aria-label="Extraction mode">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={tab === "single"}
+            className={`tab ${tab === "single" ? "active" : ""}`}
+            onClick={() => setTab("single")}
+          >
+            Single ASIN
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={tab === "bulk"}
+            className={`tab ${tab === "bulk" ? "active" : ""}`}
+            onClick={() => setTab("bulk")}
+          >
+            Bulk (CSV or Excel)
+          </button>
         </div>
-      </div>
 
-      {tab === "single" ? <SingleTab settings={settings} /> : <BulkTab settings={settings} />}
+        {tab === "single" ? <SingleTab settings={settings} /> : <BulkTab settings={settings} />}
 
-      <p className="hint" style={{ marginTop: 28 }}>
-        For research / voice-of-customer use. Respect Amazon&apos;s Conditions of Use and applicable law.
-        Deep extraction requires either your own logged-in session cookie or a managed scraping API key.
-      </p>
-    </div>
+        <footer className="footer">
+          <p>
+            <span className="fbrand">Right Side Up</span> — for research and voice-of-customer
+            work. Respect Amazon&apos;s Conditions of Use and applicable law. Deep extraction
+            needs your own logged-in session cookie or a managed scraping API key.
+          </p>
+        </footer>
+      </main>
+    </>
   );
 }
 
@@ -90,14 +122,19 @@ function SettingsPanel({
   const set = (patch: Partial<Settings>) => onChange({ ...settings, ...patch });
   return (
     <div className="panel">
-      <h2 style={{ display: "flex", justifyContent: "space-between", cursor: "pointer" }} onClick={toggle}>
-        <span>Extraction method &amp; settings</span>
-        <span className="muted">{open ? "▾" : "▸"}</span>
-      </h2>
+      <button
+        type="button"
+        className="panel-toggle"
+        onClick={toggle}
+        aria-expanded={open}
+      >
+        <span className="eyebrow">Extraction settings</span>
+        <span className="chev">{open ? "▾" : "▸"}</span>
+      </button>
       {open && (
-        <>
+        <div className="panel-body">
           <div className="row">
-            <div className="field">
+            <div className="field grow">
               <label>Marketplace</label>
               <select value={settings.marketplace} onChange={(e) => set({ marketplace: e.target.value })}>
                 {Object.entries(MARKETPLACES).map(([k, v]) => (
@@ -107,7 +144,7 @@ function SettingsPanel({
                 ))}
               </select>
             </div>
-            <div className="field">
+            <div className="field grow">
               <label>Strategy</label>
               <select value={settings.strategy} onChange={(e) => set({ strategy: e.target.value as Strategy })}>
                 <option value="auto">Auto (use what you provide)</option>
@@ -117,7 +154,7 @@ function SettingsPanel({
                 <option value="apify">Apify actor (managed)</option>
               </select>
             </div>
-            <div className="field">
+            <div className="field grow">
               <label>Max pages / facet</label>
               <select
                 value={settings.maxPagesPerFacet}
@@ -129,19 +166,20 @@ function SettingsPanel({
                   </option>
                 ))}
               </select>
-              <span className="muted">
-                ~10 reviews per page; Amazon stops serving past ~100 per facet, so 10 pages is full
-                coverage
+              <span className="hint">
+                ~10 reviews per page; Amazon stops serving past ~100 per facet, so 10 pages is
+                full coverage.
               </span>
             </div>
           </div>
 
           {(settings.strategy === "cookie" || settings.strategy === "auto") && (
-            <div className="field" style={{ marginTop: 12 }}>
+            <div className="field" style={{ marginTop: 18 }}>
               <label>
                 Amazon session cookie{" "}
                 <span className="muted">
-                  — DevTools → Network → any amazon.com request → copy the entire <code>Cookie:</code> request header
+                  — DevTools &rarr; Network &rarr; any amazon.com request &rarr; copy the entire{" "}
+                  <code>Cookie:</code> request header
                 </span>
               </label>
               <textarea
@@ -150,14 +188,14 @@ function SettingsPanel({
                 onChange={(e) => set({ cookie: e.target.value })}
               />
               <span className="hint">
-                Required because Amazon&apos;s /product-reviews/ pages now redirect anonymous visitors to login.
-                Stays in your browser → server memory only; never stored.
+                Required because Amazon&apos;s /product-reviews/ pages now redirect anonymous
+                visitors to login. Stays in your browser &rarr; server memory only; never stored.
               </span>
             </div>
           )}
 
           {(settings.strategy === "rainforest" || settings.strategy === "apify" || settings.strategy === "auto") && (
-            <div className="field" style={{ marginTop: 12 }}>
+            <div className="field" style={{ marginTop: 18 }}>
               <label>
                 {settings.strategy === "apify" ? "Apify API token" : "Rainforest API key"}{" "}
                 <span className="muted">(managed proxy + CAPTCHA solving; pick the matching strategy above)</span>
@@ -170,7 +208,7 @@ function SettingsPanel({
               />
             </div>
           )}
-        </>
+        </div>
       )}
     </div>
   );
@@ -254,7 +292,7 @@ function SingleTab({ settings }: { settings: Settings }) {
 function LogView({ logs }: { logs: ProgressEvent[] }) {
   const ref = useRef<HTMLDivElement>(null);
   return (
-    <div className="log" ref={ref} style={{ marginTop: 14 }}>
+    <div className="log" ref={ref} style={{ marginTop: 16 }}>
       {logs.map((l, i) => (
         <div key={i} className={`l-${l.type}`}>
           {l.type === "facet" ? "▸ " : l.type === "page" ? "  " : ""}
@@ -284,7 +322,7 @@ function ResultView({ result }: { result: ExtractionResult }) {
   const exportName = `${coverage.asin}_reviews`;
 
   return (
-    <div style={{ marginTop: 18 }}>
+    <div style={{ marginTop: 22 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
         <span className={`badge ${badge.cls}`}>{badge.label}</span>
         <span className="muted small">
@@ -325,7 +363,7 @@ function ResultView({ result }: { result: ExtractionResult }) {
 
       {reviews.length > 0 && (
         <>
-          <div className="row" style={{ marginTop: 14 }}>
+          <div className="row" style={{ marginTop: 16 }}>
             <button className="ghost" onClick={() => download(`${exportName}.csv`, reviewsToCsv(reviews), "text/csv")}>
               ↓ CSV
             </button>
@@ -385,7 +423,7 @@ function ReviewsTable({ reviews }: { reviews: Review[] }) {
         </table>
       </div>
       {limit < reviews.length && (
-        <button className="secondary" style={{ marginTop: 10 }} onClick={() => setLimit((l) => l + 100)}>
+        <button className="secondary" style={{ marginTop: 12 }} onClick={() => setLimit((l) => l + 100)}>
           Show more ({reviews.length - limit} hidden)
         </button>
       )}
@@ -541,9 +579,10 @@ function BulkTab({ settings }: { settings: Settings }) {
           </span>
         ) : (
           <>
-            <div style={{ fontSize: 15, color: "var(--text)" }}>Drop a CSV or Excel file, or click to browse</div>
+            <div className="dz-title">Drop a CSV or Excel file, or click to browse</div>
             <div className="hint">
-              Any layout works — every cell is scanned for ASINs and Amazon URLs. Column names don&apos;t matter.
+              Any layout works — every cell is scanned for ASINs and Amazon URLs. Column names
+              don&apos;t matter.
             </div>
           </>
         )}
@@ -564,7 +603,7 @@ function BulkTab({ settings }: { settings: Settings }) {
 
       {items.length > 0 && (
         <>
-          <div className="row" style={{ marginTop: 16, justifyContent: "space-between" }}>
+          <div className="row" style={{ marginTop: 18, justifyContent: "space-between" }}>
             <div className="muted small">
               {items.length} unique ASIN{items.length === 1 ? "" : "s"} · {doneCount} done ·{" "}
               {allReviews.length.toLocaleString()} reviews captured
@@ -587,8 +626,8 @@ function BulkTab({ settings }: { settings: Settings }) {
             </div>
           </div>
 
-          <div style={{ marginTop: 12 }}>
-            <div className="bulk-row" style={{ color: "var(--muted)", fontSize: 11, textTransform: "uppercase" }}>
+          <div style={{ marginTop: 14 }}>
+            <div className="bulk-head">
               <div>ASIN</div>
               <div>Status</div>
               <div>Reviews</div>
@@ -600,17 +639,16 @@ function BulkTab({ settings }: { settings: Settings }) {
                 <div>
                   {it.status === "running" && <span className="spinner" />}{" "}
                   <span
-                    className={
+                    className={`status-tag ${
                       it.status === "done" ? "l-done" : it.status === "error" ? "l-error" : "muted"
-                    }
-                    style={{ fontFamily: "var(--mono)", fontSize: 12 }}
+                    }`}
                   >
                     {it.status}
                     {it.error ? `: ${it.error.slice(0, 60)}` : ""}
                   </span>
                 </div>
-                <div>{it.collected.toLocaleString()}</div>
-                <div className="muted">{it.total != null ? it.total.toLocaleString() : "—"}</div>
+                <div className="v">{it.collected.toLocaleString()}</div>
+                <div className="muted v">{it.total != null ? it.total.toLocaleString() : "—"}</div>
               </div>
             ))}
           </div>
