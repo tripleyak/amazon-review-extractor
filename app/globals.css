@@ -135,28 +135,11 @@ a:hover { color: var(--accent); }
   justify-content: space-between;
 }
 
-/* Stacked RIGHT / SIDE / UP wordmark logo (text lockup, staircase tick) */
-.wordmark {
-  display: inline-flex;
-  flex-direction: column;
-  line-height: 0.92;
-  font-weight: 900;
-  font-size: 12px;
-  letter-spacing: 0.01em;
-  text-transform: uppercase;
-  color: var(--white);
-  position: relative;
-  padding-right: 12px;
-}
-.wordmark::after {
-  content: "";
-  position: absolute;
-  top: 1px;
-  right: 0;
-  width: 7px;
-  height: 7px;
-  border-top: 1.5px solid var(--white);
-  border-right: 1.5px solid var(--white);
+.brand-logo {
+  display: block;
+  width: 92px;
+  height: auto;
+  flex: 0 0 auto;
 }
 .nav .nav-tag {
   font-size: 12px;
@@ -588,6 +571,15 @@ td a:hover { border-bottom-color: currentColor; }
   vertical-align: -1px;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 520px) {
+  .hero::after {
+    top: -150px;
+    right: -110px;
+    width: 220px;
+    height: 220px;
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: 0.001ms !important; scroll-behavior: auto !important; }
