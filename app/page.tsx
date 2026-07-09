@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { MARKETPLACES } from "@/lib/marketplaces";
 import {
@@ -44,11 +45,15 @@ export default function Page() {
 
       <header className="hero">
         <nav className="nav" aria-label="Primary">
-          <span className="wordmark" aria-label="Right Side Up">
-            <span>Right</span>
-            <span>Side</span>
-            <span>Up</span>
-          </span>
+          <Image
+            className="brand-logo"
+            src="/right-side-up-white.png"
+            alt="Right Side Up"
+            width={1690}
+            height={1632}
+            priority
+            sizes="92px"
+          />
           <span className="nav-tag">Review Extractor</span>
         </nav>
         <div className="hero-inner">
