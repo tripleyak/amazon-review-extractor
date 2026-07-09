@@ -8,7 +8,7 @@ import {
   SITE_PASSWORD_ROUTE,
 } from "@/lib/site-password";
 
-const excludedPaths = new Set(["/favicon.ico", "/icon.svg"]);
+const excludedPaths = new Set(["/favicon.ico", "/icon.svg", "/right-side-up-white.png"]);
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
